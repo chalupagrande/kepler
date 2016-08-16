@@ -1,0 +1,57 @@
+
+<template id="component">
+  <style>
+    .wrapper{
+      color: black;
+      border: 15px solid black;
+
+    }
+  </style>
+  <div class="wrapper">
+    <h1>CSS is amazing</h1>
+    <content select='h1'></content>
+  </div>
+</template>
+
+
+<script>
+
+var importee = (document._currentScript || document.currentScript).ownerDocument;
+var template = importee.getElementById('component')
+var clone = document.importNode(template.content, true)
+
+
+window.clone = root
+
+/* custom elements
+~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+// //register custom element
+// var superButton = Object.create(HTMLElement.prototype);
+// superButton.createdCallback = function() {
+//   var template = importee.getElementById('template')
+//   var clone = document.importNode(template, true)
+//   window.clone = clone
+//   root.appendChild(clone)
+
+// };
+// superButton.attachedCallback = function(){
+//   console.log('attached')
+// }
+// superButton.detachedCallback = function(){
+//   console.log('detached')
+// }
+// superButton.attributeChangedCallback = function(){
+//   console.log('changed')
+// }
+
+// superButton.foo = function() {
+//   console.log('foo() called');
+// };
+
+// var superButton = document.registerElement('super-button', {
+//   prototype: superButton
+// });
+
+</script>
