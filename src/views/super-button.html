@@ -1,57 +1,55 @@
 
 <template id="component">
-  <style>
-    .wrapper{
-      color: black;
-      border: 15px solid black;
-
+  <style type="text/css">
+    button {
+      cursor: pointer;
+      background-color: blue;
+      padding: 1rem;
+      color: white;
+      border: 3px solid red;
     }
   </style>
-  <div class="wrapper">
-    <h1>CSS is amazing</h1>
-    <content select='h1'></content>
-  </div>
+  <button data-text="updated text"><span></span></button>
 </template>
 
 
 <script>
-
 var importee = (document._currentScript || document.currentScript).ownerDocument;
 var template = importee.getElementById('component')
-var clone = document.importNode(template.content, true)
-
-
-window.clone = root
 
 /* custom elements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+//register custom element
+var superButton = Object.create(HTMLElement.prototype);
+superButton.createdCallback = function() {
+  var clone = document.importNode(template.content, true)
+  var text = clone.querySelector('button').getAttribute('data-text')
+  var root = this.createShadowRoot()
+  if(text){
+    this.text = text
+    clone.querySelector('span').innerText = this.text
+  } else {
+    clone.querySelector('span').innerText = 'default'
+  }
+  root.appendChild(clone)
+};
+superButton.attachedCallback = function(){
+  console.log('attached')
+}
+superButton.detachedCallback = function(){
+  console.log('detached')
+}
+superButton.attributeChangedCallback = function(){
+  console.log('changed')
+}
 
-// //register custom element
-// var superButton = Object.create(HTMLElement.prototype);
-// superButton.createdCallback = function() {
-//   var template = importee.getElementById('template')
-//   var clone = document.importNode(template, true)
-//   window.clone = clone
-//   root.appendChild(clone)
+superButton.foo = function() {
+  console.log('foo() called');
+};
 
-// };
-// superButton.attachedCallback = function(){
-//   console.log('attached')
-// }
-// superButton.detachedCallback = function(){
-//   console.log('detached')
-// }
-// superButton.attributeChangedCallback = function(){
-//   console.log('changed')
-// }
-
-// superButton.foo = function() {
-//   console.log('foo() called');
-// };
-
-// var superButton = document.registerElement('super-button', {
-//   prototype: superButton
-// });
+var myButton = document.registerElement('super-button', {
+  prototype: superButton
+});
 
 </script>
