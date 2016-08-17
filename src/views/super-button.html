@@ -7,6 +7,7 @@
       padding: 1rem;
       color: white;
       border: 3px solid red;
+
     }
   </style>
   <button data-text="updated text"><span></span></button>
@@ -17,6 +18,7 @@
 var importee = (document._currentScript || document.currentScript).ownerDocument;
 var template = importee.getElementById('component')
 
+
 /* custom elements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -26,12 +28,14 @@ superButton.createdCallback = function() {
   var clone = document.importNode(template.content, true)
   var text = clone.querySelector('button').getAttribute('data-text')
   var root = this.createShadowRoot()
+
   if(text){
     this.text = text
     clone.querySelector('span').innerText = this.text
   } else {
     clone.querySelector('span').innerText = 'default'
   }
+
   root.appendChild(clone)
 };
 superButton.attachedCallback = function(){
