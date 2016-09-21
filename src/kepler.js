@@ -14,11 +14,14 @@ class Kepler {
     let node = Object.create(HTMLElement.prototype)
     //createdCallback
     node.createdCallback = function(){
-      debugger
       let clone = document.importNode(template.content, true)
-      let root = this.createShadowRoot()
-      root.appendChild(clone)
-      console.log("ROOT LOG - KEP", root)
+      if(opts.expose){
+        this.appendChild(clone)
+      } else {
+        let root = this.createShadowRoot()
+        root.appendChild(clone)
+      }
+      
     }
 
     //attachedCallback

@@ -1,26 +1,26 @@
 
 <template id="kepler-button">
   <style type="text/css">
-    button {
+    .jamie-button .button {
       width: 100px;
       height: 200px;
       display: block;
       cursor: pointer;
-      background-color: green;
       padding: 1rem;
       color: white;
-      border: 3px solid red;
-
     }
   </style>
-  <button><span>Something here</span></button>
+  <div class="jamie-button">
+    <button class="button"><span>Something here</span></button>
+  </div>
 </template>
 
 
 <script>
   let jamie = new Kepler({
     element: '#kepler-button',
-    name: 'jamie-skinner'
+    name: 'jamie-skinner',
+    expose: true
   })
 
 </script>
