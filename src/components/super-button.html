@@ -25,8 +25,11 @@ var template = importee.getElementById('component')
 //register custom element
 var superButton = Object.create(HTMLElement.prototype);
 superButton.createdCallback = function() {
+  console.log(this)
   var clone = document.importNode(template.content, true)
   var text = clone.querySelector('button').getAttribute('data-text')
+  console.log('this', this)
+
   var root = this.createShadowRoot()
 
   if(text){
@@ -37,6 +40,7 @@ superButton.createdCallback = function() {
   }
 
   root.appendChild(clone)
+  console.log("ROOT LOG", root)
 };
 superButton.attachedCallback = function(){
   console.log('attached')

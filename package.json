@@ -13,9 +13,8 @@
     "browser-sync": "^2.13.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
-    "gulp-plumber": "^1.1.0"
+    "gulp-plumber": "^1.1.0",
+    "gulp-sass": "^2.3.2"
   },
-  "dependencies": {
-    "webcomponents.js": "^0.7.22"
-  }
+  "dependencies": {}
 }
