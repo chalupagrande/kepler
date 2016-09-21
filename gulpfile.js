@@ -19,7 +19,7 @@ gulp.task('compile', function(){
              .pipe(babel({
                presets: ['es2015']
              }))
-             // .pipe(plumber.stop())
+             .pipe(plumber.stop())
              .pipe(gulp.dest('./dist'))
 })
 
