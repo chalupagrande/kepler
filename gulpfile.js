@@ -5,7 +5,7 @@ var plumber = require('gulp-plumber');
 var sass = require('gulp-sass');
 
 // gulp.task('serve', ['compile'], function(){
-gulp.task('serve', function(){
+gulp.task('serve', ['compile-sass'], function(){
   browserSync.init({
     server: {
       baseDir:'./'
@@ -16,13 +16,22 @@ gulp.task('serve', function(){
 })
 
 gulp.task('compile', function(){
-  return gulp.src(['src/**/*.js','*.html'])
+  return gulp.src(['src/**/*.js'])
              .pipe(plumber())
              .pipe(babel({
                presets: ['es2015']
              }))
              .pipe(plumber.stop())
              .pipe(gulp.dest('./dist'))
+})
+
+
+gulp.task('compile-sass', function(){
+  return gulp.src(['src/components/*.scss'])
+            .pipe(plumber())
+            .pipe(sass())
+            .pipe(plumber.stop())
+            .pipe(gulp.dest('./dist/css/'))
 })
 
 gulp.task('default', ['serve'], function(){

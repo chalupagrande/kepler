@@ -1,17 +1,8 @@
 
 <template id="kepler-button">
-  <style type="text/css">
-    .jamie-button .button {
-      width: 100px;
-      height: 200px;
-      display: block;
-      cursor: pointer;
-      padding: 1rem;
-      color: white;
-    }
-  </style>
+  <link rel="import" href="../../dist/css/button.css">
   <div class="jamie-button">
-    <button class="button"><span>Something here</span></button>
+    <button class="button"><span>Kepler Button</span></button>
   </div>
 </template>
 
@@ -20,7 +11,7 @@
   let jamie = new Kepler({
     element: '#kepler-button',
     name: 'jamie-skinner',
-    expose: true
+    expose: false
   })
 
 </script>

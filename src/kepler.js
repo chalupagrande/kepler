@@ -14,14 +14,17 @@ class Kepler {
     let node = Object.create(HTMLElement.prototype)
     //createdCallback
     node.createdCallback = function(){
-      let clone = document.importNode(template.content, true)
-      if(opts.expose){
-        this.appendChild(clone)
-      } else {
-        let root = this.createShadowRoot()
-        root.appendChild(clone)
-      }
-      
+      // createDemoStyleTag(template)
+      let callback = (function(){
+        let clone = document.importNode(template.content, true)
+        if(opts.expose){
+          this.appendChild(clone)
+        } else {
+          let root = this.createShadowRoot()
+          root.appendChild(clone)
+        }
+      }).bind(this)
+      getStyleSheet(template.content, callback)
     }
 
     //attachedCallback
@@ -62,3 +65,36 @@ class Kepler {
 
 /* Helpers 
 ~~~~~~~~~~~~~~ */
+
+
+function getStyleSheet(fragment, cb){
+  var path = fragment.querySelector('link').getAttribute('href')
+  fetch(path).then(function(response){
+    return response.blob()
+  }).then(function(blob){
+    var reader = new FileReader() 
+    reader.addEventListener("loadend", function(){
+      //SUCCESSFULLY FETCHED THE STYLES!!
+      createStyleTag(fragment, this.result)
+      cb()
+    })
+    reader.readAsText(blob)
+
+  })
+
+}
+
+
+function createDemoStyleTag(fragment){
+  debugger;
+  var style = document.createElement('style')
+  style.innerHTML = "button { background-color: cyan}"
+  fragment.content.appendChild(style)
+
+}
+
+function createStyleTag(fragment, styleText){
+  var style = document.createElement('style')
+  style.innerHTML = styleText
+  fragment.insertBefore(style, fragment.firstElementChild)
+}
