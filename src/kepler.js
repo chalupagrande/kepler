@@ -50,10 +50,8 @@ class Kepler {
       var jamie = document.registerElement(opts.name, {
         prototype: node
       })
-      console.log('thing', this)
     }
-    let k = register.bind(window)
-    k()
+    register.call(window)
   
     
     this.node = node
@@ -94,7 +92,39 @@ function createDemoStyleTag(fragment){
 }
 
 function createStyleTag(fragment, styleText){
-  var style = document.createElement('style')
-  style.innerHTML = styleText
-  fragment.insertBefore(style, fragment.firstElementChild)
+  debugger;
+  let result = findEncapsulatedStyles(styleText)
+  //add encapsulated styles to fragment
+  var encapsulatedStyle = document.createElement('style')
+  encapsulatedStyle.innerHTML = result.tagged
+  fragment.insertBefore(encapsulatedStyle, fragment.firstElementChild)
+
+  //add styles to Global Stylesheet
+  let globalStyle = document.createElement('style')
+  globalStyle.innerHTML = result.untagged
+  document.head.appendChild(globalStyle)
+
+}
+
+
+
+// TODO:  make this regex more elegant. 
+function findEncapsulatedStyles(styleString){
+  let result = {
+    tagged: [],
+    untagged: []
+  }
+
+  let initialTagged = styleString.match(/\:kepler[^{]+[^}]+/gi)
+  result.tagged = initialTagged.map((el)=>{
+    styleString = styleString.replace(el+'}', '')
+    el = el.replace(/\:kepler /gi,'')
+    return el += '}'
+  })
+  result.untagged.push(styleString.trim())
+  result.tagged = result.tagged.join('\n')
+  result.untagged = result.untagged.join('\n')
+  
+  return result
+
 }

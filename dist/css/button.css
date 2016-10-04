@@ -1,2 +1,10 @@
 button {
-  background-color: green; }
+  background-color: cyan; }
+
+:kepler button {
+  background-color: blue; }
+  :kepler button span {
+    border: 1px solid yellow; }
+
+:kepler p {
+  font-family: Helvetica; }
