@@ -5,17 +5,18 @@ var plumber = require('gulp-plumber');
 var sass = require('gulp-sass');
 
 // gulp.task('serve', ['compile'], function(){
-gulp.task('serve', ['compile-sass'], function(){
+gulp.task('serve', ['compile-sass', 'compile-js'], function(){
   browserSync.init({
     server: {
       baseDir:'./'
     }
   })
-  // gulp.watch(['src/**/*.js', '**/*.html'] , ['compile'])
-  gulp.watch(['src/**/*.js', '**/*.html']).on('change', browserSync.reload)
+  gulp.watch(['src/kepler.js'] , ['compile-js'])
+  gulp.watch(['src/**/*.scss'] , ['compile-sass'])
+  gulp.watch(['src/**/*.js', '**/*.html', 'src/**/*.scss']).on('change', browserSync.reload)
 })
 
-gulp.task('compile', function(){
+gulp.task('compile-js', function(){
   return gulp.src(['src/**/*.js'])
              .pipe(plumber())
              .pipe(babel({
@@ -27,7 +28,7 @@ gulp.task('compile', function(){
 
 
 gulp.task('compile-sass', function(){
-  return gulp.src(['src/components/*.scss'])
+  return gulp.src(['src/scss/**/*.scss'])
             .pipe(plumber())
             .pipe(sass())
             .pipe(plumber.stop())

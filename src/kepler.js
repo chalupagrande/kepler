@@ -37,7 +37,7 @@ class Kepler {
     }
     //attributeChangedCallback
     node.attributeChangedCallback = function(){
-
+      console.log('attribtue changed')
     }
 
     
@@ -98,6 +98,7 @@ function createStyleTag(fragment, styleText){
   var encapsulatedStyle = document.createElement('style')
   encapsulatedStyle.innerHTML = result.tagged
   fragment.insertBefore(encapsulatedStyle, fragment.firstElementChild)
+  
 
   //add styles to Global Stylesheet
   let globalStyle = document.createElement('style')
@@ -109,6 +110,8 @@ function createStyleTag(fragment, styleText){
 
 
 // TODO:  make this regex more elegant. 
+// TODO / IDEA: reverse the meaning of TAGGED/UNTAGGED depending on whether 
+//    or not the expose variable is true.
 function findEncapsulatedStyles(styleString){
   let result = {
     tagged: [],

@@ -1,16 +1,12 @@
 @import 'vars';
 
-button {
-  background-color: $color;
-
-}
 
 :kepler {
   button {
-    background-color: blue;
+    background-color: purple;
 
     span {
-      border: 1px solid yellow;
+      border: 1px solid white;
     }
   }
   p {
