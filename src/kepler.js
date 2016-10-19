@@ -12,26 +12,36 @@ class Kepler {
     var template = importee.querySelector(opts.element)
 
     let node = Object.create(HTMLElement.prototype)
-    //createdCallback
     node.createdCallback = function(){
       // createDemoStyleTag(template)
+      this._root = this.createShadowRoot()
+
       let callback = (function(){
         let clone = document.importNode(template.content, true)
         if(opts.expose){
           this.appendChild(clone)
         } else {
-          let root = this.createShadowRoot()
-          root.appendChild(clone)
+          this._root.appendChild(clone)
         }
+        console.log('calling back')
       }).bind(this)
       getStyleSheet(template.content, callback)
     }
 
     //attachedCallback
     node.attachedCallback = function(){
-      console.log('kepler attached', this)
+      console.log('attached')
+      //attach event listeners
+      let listeners = opts.listeners
+      for(let event in listeners){
+        for(let element in listeners[event]){
+          let els = this._root.querySelectorAll(element)
+          els.forEach((el)=>{
+            el.addEventListener(event, listeners[event][element])
+          })
+        }
+      }
     }
-    //detachedCallback
     node.detachedCallback = function(){
 
     }
@@ -67,18 +77,41 @@ class Kepler {
 
 function getStyleSheet(fragment, cb){
   var path = fragment.querySelector('link').getAttribute('href')
-  fetch(path).then(function(response){
-    return response.blob()
-  }).then(function(blob){
-    var reader = new FileReader()
-    reader.addEventListener("loadend", function(){
-      //SUCCESSFULLY FETCHED THE STYLES!!
-      createStyleTag(fragment, this.result)
-      cb()
-    })
-    reader.readAsText(blob)
 
-  })
+  let xhr = new XMLHttpRequest();
+  xhr.open('GET', path, false)
+  xhr.onload = (e)=>{
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        console.log(xhr.responseText);
+        createStyleTag(fragment, xhr.responseText)
+        cb()
+      } else {
+        console.error(xhr.statusText);
+      }
+    }
+  }
+  xhr.onerror = (e)=>{
+    console.log(xhr.statusText)
+  }
+  xhr.send(null)
+
+
+  //NOTE: UNABLE TO USE ASYNCHRONOUS FETCH BECAUSE DOM NODE IS ATTACHING
+  //  BEFORE STYLE SHEET IS APPLIED.
+
+  // fetch(path).then(function(response){
+  //   return response.blob()
+  // }).then(function(blob){
+  //   var reader = new FileReader()
+  //   reader.addEventListener("loadend", function(){
+  //     //SUCCESSFULLY FETCHED THE STYLES!!
+  //     createStyleTag(fragment, this.result)
+  //     cb()
+  //   })
+  //   reader.readAsText(blob)
+
+  // })
 
 }
 

@@ -20,26 +20,47 @@ var Kepler = function () {
     var template = importee.querySelector(opts.element);
 
     var node = Object.create(HTMLElement.prototype);
-    //createdCallback
     node.createdCallback = function () {
       // createDemoStyleTag(template)
+      this._root = this.createShadowRoot();
+
       var callback = function () {
         var clone = document.importNode(template.content, true);
         if (opts.expose) {
           this.appendChild(clone);
         } else {
-          var root = this.createShadowRoot();
-          root.appendChild(clone);
+          this._root.appendChild(clone);
         }
+        console.log('calling back');
       }.bind(this);
       getStyleSheet(template.content, callback);
     };
 
     //attachedCallback
     node.attachedCallback = function () {
-      console.log('kepler attached', this);
+      var _this = this;
+
+      console.log('attached');
+      //attach event listeners
+      var listeners = opts.listeners;
+
+      var _loop = function _loop(event) {
+        var _loop2 = function _loop2(element) {
+          var els = _this._root.querySelectorAll(element);
+          els.forEach(function (el) {
+            el.addEventListener(event, listeners[event][element]);
+          });
+        };
+
+        for (var element in listeners[event]) {
+          _loop2(element);
+        }
+      };
+
+      for (var event in listeners) {
+        _loop(event);
+      }
     };
-    //detachedCallback
     node.detachedCallback = function () {};
     //attributeChangedCallback
     node.attributeChangedCallback = function () {
@@ -76,17 +97,40 @@ var Kepler = function () {
 
 function getStyleSheet(fragment, cb) {
   var path = fragment.querySelector('link').getAttribute('href');
-  fetch(path).then(function (response) {
-    return response.blob();
-  }).then(function (blob) {
-    var reader = new FileReader();
-    reader.addEventListener("loadend", function () {
-      //SUCCESSFULLY FETCHED THE STYLES!!
-      createStyleTag(fragment, this.result);
-      cb();
-    });
-    reader.readAsText(blob);
-  });
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', path, false);
+  xhr.onload = function (e) {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        console.log(xhr.responseText);
+        createStyleTag(fragment, xhr.responseText);
+        cb();
+      } else {
+        console.error(xhr.statusText);
+      }
+    }
+  };
+  xhr.onerror = function (e) {
+    console.log(xhr.statusText);
+  };
+  xhr.send(null);
+
+  //NOTE: UNABLE TO USE ASYNCHRONOUS FETCH BECAUSE DOM NODE IS ATTACHING
+  //  BEFORE STYLE SHEET IS APPLIED.
+
+  // fetch(path).then(function(response){
+  //   return response.blob()
+  // }).then(function(blob){
+  //   var reader = new FileReader()
+  //   reader.addEventListener("loadend", function(){
+  //     //SUCCESSFULLY FETCHED THE STYLES!!
+  //     createStyleTag(fragment, this.result)
+  //     cb()
+  //   })
+  //   reader.readAsText(blob)
+
+  // })
 }
 
 function createDemoStyleTag(fragment) {

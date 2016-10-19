@@ -12,17 +12,12 @@
     element: '#kepler-button',
     name: 'jamie-skinner',
     expose: false,
-    method : {
+    listeners : {
       click: {
-        '.button' : function(){
-
-        },
-        '.header' : function(){
-
+        'button' : function(){
+          alert('I WAS CLICKED BALLS')
+          console.log(this)
         }
-      },
-      hover: {
-
       }
     }
   })
