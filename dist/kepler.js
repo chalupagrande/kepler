@@ -71,7 +71,7 @@ var Kepler = function () {
   return Kepler;
 }();
 
-/* Helpers 
+/* Helpers
 ~~~~~~~~~~~~~~ */
 
 function getStyleSheet(fragment, cb) {
@@ -90,14 +90,12 @@ function getStyleSheet(fragment, cb) {
 }
 
 function createDemoStyleTag(fragment) {
-  debugger;
   var style = document.createElement('style');
   style.innerHTML = "button { background-color: cyan}";
   fragment.content.appendChild(style);
 }
 
 function createStyleTag(fragment, styleText) {
-  debugger;
   var result = findEncapsulatedStyles(styleText);
   //add encapsulated styles to fragment
   var encapsulatedStyle = document.createElement('style');
@@ -110,8 +108,8 @@ function createStyleTag(fragment, styleText) {
   document.head.appendChild(globalStyle);
 }
 
-// TODO:  make this regex more elegant. 
-// TODO / IDEA: reverse the meaning of TAGGED/UNTAGGED depending on whether 
+// TODO:  make this regex more elegant.
+// TODO / IDEA: reverse the meaning of TAGGED/UNTAGGED depending on whether
 //    or not the expose variable is true.
 function findEncapsulatedStyles(styleString) {
   var result = {

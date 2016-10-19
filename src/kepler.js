@@ -40,20 +40,20 @@ class Kepler {
       console.log('attribtue changed')
     }
 
-    
+
     node.foo = function(){
       console.log('fooooooo')
     }
-    
+
     let register = function(){
-      
+
       var jamie = document.registerElement(opts.name, {
         prototype: node
       })
     }
     register.call(window)
-  
-    
+
+
     this.node = node
   }
   method(){
@@ -61,7 +61,7 @@ class Kepler {
   }
 }
 
-/* Helpers 
+/* Helpers
 ~~~~~~~~~~~~~~ */
 
 
@@ -70,7 +70,7 @@ function getStyleSheet(fragment, cb){
   fetch(path).then(function(response){
     return response.blob()
   }).then(function(blob){
-    var reader = new FileReader() 
+    var reader = new FileReader()
     reader.addEventListener("loadend", function(){
       //SUCCESSFULLY FETCHED THE STYLES!!
       createStyleTag(fragment, this.result)
@@ -84,7 +84,6 @@ function getStyleSheet(fragment, cb){
 
 
 function createDemoStyleTag(fragment){
-  debugger;
   var style = document.createElement('style')
   style.innerHTML = "button { background-color: cyan}"
   fragment.content.appendChild(style)
@@ -92,13 +91,12 @@ function createDemoStyleTag(fragment){
 }
 
 function createStyleTag(fragment, styleText){
-  debugger;
   let result = findEncapsulatedStyles(styleText)
   //add encapsulated styles to fragment
   var encapsulatedStyle = document.createElement('style')
   encapsulatedStyle.innerHTML = result.tagged
   fragment.insertBefore(encapsulatedStyle, fragment.firstElementChild)
-  
+
 
   //add styles to Global Stylesheet
   let globalStyle = document.createElement('style')
@@ -109,8 +107,8 @@ function createStyleTag(fragment, styleText){
 
 
 
-// TODO:  make this regex more elegant. 
-// TODO / IDEA: reverse the meaning of TAGGED/UNTAGGED depending on whether 
+// TODO:  make this regex more elegant.
+// TODO / IDEA: reverse the meaning of TAGGED/UNTAGGED depending on whether
 //    or not the expose variable is true.
 function findEncapsulatedStyles(styleString){
   let result = {
@@ -127,7 +125,7 @@ function findEncapsulatedStyles(styleString){
   result.untagged.push(styleString.trim())
   result.tagged = result.tagged.join('\n')
   result.untagged = result.untagged.join('\n')
-  
+
   return result
 
 }
