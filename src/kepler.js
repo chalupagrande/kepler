@@ -19,13 +19,14 @@ class Kepler {
       let callback = (function(){
         let clone = document.importNode(template.content, true)
 
-        //Complicated
-
+        // complicates things
         // if(opts.expose){
         //   this.appendChild(clone)
         // } else {
         //   this._root.appendChild(clone)
         // }
+        this._root.appendChild(clone)
+
         console.log('calling back')
       }).bind(this)
       getStyleSheet(template.content, callback)
@@ -46,6 +47,9 @@ class Kepler {
       }
     }
     node.detachedCallback = function(){
+      console.log('detachedCallback')
+
+      //TODO: detach event listeners? Not sure if i need to
 
     }
     //attributeChangedCallback
@@ -59,7 +63,6 @@ class Kepler {
     }
 
     let register = function(){
-
       var jamie = document.registerElement(opts.name, {
         prototype: node
       })

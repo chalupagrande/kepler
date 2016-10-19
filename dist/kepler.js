@@ -26,11 +26,15 @@ var Kepler = function () {
 
       var callback = function () {
         var clone = document.importNode(template.content, true);
-        if (opts.expose) {
-          this.appendChild(clone);
-        } else {
-          this._root.appendChild(clone);
-        }
+
+        // complicates things
+        // if(opts.expose){
+        //   this.appendChild(clone)
+        // } else {
+        //   this._root.appendChild(clone)
+        // }
+        this._root.appendChild(clone);
+
         console.log('calling back');
       }.bind(this);
       getStyleSheet(template.content, callback);
@@ -61,7 +65,11 @@ var Kepler = function () {
         _loop(event);
       }
     };
-    node.detachedCallback = function () {};
+    node.detachedCallback = function () {
+      console.log('detachedCallback');
+
+      //TODO: detach event listeners? Not sure if i need to
+    };
     //attributeChangedCallback
     node.attributeChangedCallback = function () {
       console.log('attribtue changed');
@@ -72,7 +80,6 @@ var Kepler = function () {
     };
 
     var register = function register() {
-
       var jamie = document.registerElement(opts.name, {
         prototype: node
       });
