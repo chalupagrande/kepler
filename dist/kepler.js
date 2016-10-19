@@ -162,14 +162,17 @@ function findEncapsulatedStyles(styleString) {
   };
 
   var initialTagged = styleString.match(/\:kepler[^{]+[^}]+/gi);
-  result.tagged = initialTagged.map(function (el) {
-    styleString = styleString.replace(el + '}', '');
-    el = el.replace(/\:kepler /gi, '');
-    return el += '}';
-  });
+  if (initialTagged) {
+    result.tagged = initialTagged.map(function (el) {
+      styleString = styleString.replace(el + '}', '');
+      el = el.replace(/\:kepler /gi, '');
+      return el += '}';
+    });
+    result.tagged = result.tagged.join('\n');
+  }
   result.untagged.push(styleString.trim());
-  result.tagged = result.tagged.join('\n');
   result.untagged = result.untagged.join('\n');
 
+  console.log(result);
   return result;
 }

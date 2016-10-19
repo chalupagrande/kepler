@@ -1,0 +1,29 @@
+<template id="progress-circle">
+  <link rel="import" href="../../dist/css/progress-circle.css">
+  <svg class="animated" height="150" width="150">
+    <circle class="down" cx="50%" cy="50%" r="50" stroke-dasharray="2 5"/>
+    <circle class="mask" cx="50%" cy="50%" r="50" stroke-dasharray="0 314" stroke-dashoffset="0"/>
+    <circle class="normal" cx="50%" cy="50%" r="50" stroke-dasharray="0 314" stroke-dashoffset="0"/>
+    <circle class="warning" cx="50%" cy="50%" r="50" stroke-dasharray="0 314" stroke-dashoffset="0"/>
+    <circle class="critical" cx="50%" cy="50%" r="50" stroke-dasharray="0 314" stroke-dashoffset="0"/>
+  </svg>
+</template>
+
+<script>
+  let progressCircle = new Kepler({
+    element: '#progress-circle',
+    name: 'progress-circle',
+    expose: false,
+    listeners : {
+      click: {
+        'button' : function(){
+          alert('I WAS CLICKED')
+          console.log(this)
+        }
+      }
+    },
+    methods : {
+
+    }
+  })
+</script>
