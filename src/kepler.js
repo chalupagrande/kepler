@@ -18,11 +18,14 @@ class Kepler {
 
       let callback = (function(){
         let clone = document.importNode(template.content, true)
-        if(opts.expose){
-          this.appendChild(clone)
-        } else {
-          this._root.appendChild(clone)
-        }
+
+        //Complicated
+
+        // if(opts.expose){
+        //   this.appendChild(clone)
+        // } else {
+        //   this._root.appendChild(clone)
+        // }
         console.log('calling back')
       }).bind(this)
       getStyleSheet(template.content, callback)
