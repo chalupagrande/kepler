@@ -9,9 +9,6 @@ var Kepler = function () {
     _classCallCheck(this, Kepler);
 
     this.components = [];
-    this.register = function (name, prototype) {
-      return document.registerElement(name, { prototype: prototype });
-    }.bind(window);
   }
 
   _createClass(Kepler, [{
@@ -75,27 +72,30 @@ var Kepler = function () {
   }], [{
     key: 'Component',
     value: function Component(opts) {
-      debugger;
       var importee = (document._currentScript || document.currentScript).ownerDocument;
       var template = importee.querySelector(opts.element);
       var prototype = Object.create(HTMLElement.prototype);
       prototype._root = null;
 
       prototype.createdCallback = function () {
-        debugger;
         prototype._root = this.createShadowRoot();
+
         var callback = function () {
           //duplicates node appends it to shadowroot
           prototype._root.appendChild(document.importNode(template.content, true));
         }.bind(this);
+
         //fetch linked styles in template and create styletag
-        getStyleSheet(template.content, callback);
+        if (template.content.querySelector('link[rel="import"]')) {
+          getStyleSheet(template.content, callback);
+        } else {
+          callback();
+        }
       };
 
       prototype.attachedCallback = function () {
         var _this = this;
 
-        debugger;
         var listeners = opts.listeners;
 
         var _loop = function _loop(event) {
@@ -124,11 +124,17 @@ var Kepler = function () {
         console.log('attribute changed callback');
       };
 
-      return prototype;
+      return this.register(prototype, opts.name);
     }
   }, {
     key: 'register',
-    value: function register() {}
+    value: function register(prototype, name) {
+      return function (prototype, name) {
+        return document.registerElement(name, {
+          prototype: prototype
+        });
+      }.call(window, prototype, name);
+    }
   }]);
 
   return Kepler;

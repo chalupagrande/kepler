@@ -2,17 +2,19 @@ let Kepler = (()=>{
 
   return {
     components: new Map(),
-    Component: function(opts){
+    Component: function(element, opts){
+
       let importee = (document._currentScript || document.currentScript).ownerDocument;
-      var template = importee.querySelector(opts.element)
+      var template = importee.querySelector(element)
       let prototype = Object.create(HTMLElement.prototype)
-      prototype._root = null
+      prototype._vm = Object.assign({}, opts.properties)
+      prototype._vm._root = null
 
       prototype.createdCallback = function(){
-        prototype._root = this.createShadowRoot()
+        prototype._vm._root = this.createShadowRoot()
         let callback = (function(){
           //duplicates node appends it to shadowroot
-          prototype._root.appendChild(document.importNode(template.content, true))
+          prototype._vm._root.appendChild(document.importNode(template.content, true))
           Kepler.components.set(this, {jamie: true})
         }).bind(this)
         //fetch linked styles in template and create styletag
@@ -28,7 +30,7 @@ let Kepler = (()=>{
         let listeners = opts.listeners
         for(let event in opts.listeners){
           for(let element in listeners[event]){
-            let els = this._root.querySelectorAll(element)
+            let els = this._vm._root.querySelectorAll(element)
             els.forEach((el)=>{
               el.addEventListener(event, listeners[event][element])
             })
@@ -36,7 +38,7 @@ let Kepler = (()=>{
         }
         //bind methods to web-component
         for(let methodName in opts.methods){
-          this[methodName] = opts.methods[methodName]
+          this[methodName] = opts.methods[methodName].bind(this)
         }
 
         if(opts.methods.init){
@@ -52,8 +54,7 @@ let Kepler = (()=>{
         console.log('attr')
       }
 
-      return this.register(prototype, opts.name)
-
+      return this.register(prototype, opts.name || element.slice(1))
     },
 
     register: function(prototype, name){

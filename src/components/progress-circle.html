@@ -10,10 +10,8 @@
 </template>
 
 <script>
-  let progressCircle = Kepler.Component({
-    element: '#progress-circle',
+  let progressCircle = Kepler.Component('#progress-circle', {
     name: 'progress-circle',
-    // expose: false,
     listeners : {
       click: {
         'button' : function(){
@@ -23,13 +21,70 @@
       }
     },
     methods : {
-      foo: function(){
-        return 'foooooooooooooooooo'
+      findLength: function findLength(percent, circumference){
+        return Math.round(percent*circumference / 100)
       },
+      updateCircle: updateCircle,
       init: function(){
-        console.log(this)
-        debugger
+        setTimeout(()=>{
+          this.updateCircle(30,10,20,40)
+        },100)
       }
-    }
+    },
+
   })
+
+
+  function updateCircle(normal, warning, critical, down){
+    const svg = this._vm._root.querySelector('svg')
+
+    const r = 50
+    const circumference = Math.floor(Math.PI*2*r)
+
+    const buffer = 2
+      let nl = this.findLength(normal, circumference)
+      let wl = this.findLength(warning, circumference)
+      let cl = down > 3*buffer ? this.findLength(critical, circumference) : this.findLength(critical, circumference) - 3*buffer
+      let dl = this.findLength(down, circumference)
+
+      let mask = svg.querySelector('.mask')
+      var values = [
+        {
+          el: svg.querySelector('.normal'),
+          class: 'normal',
+          dashLength: nl,
+          dashNegative: circumference - nl
+        },
+        {
+          el: svg.querySelector('.warning'),
+          class: 'warning',
+          dashLength: wl,
+          dashNegative: circumference - wl
+        },
+        {
+          el: svg.querySelector('.critical'),
+          class: 'critical',
+          dashLength: cl,
+          dashNegative: circumference - cl
+        },
+      ]
+
+      let offset = 0
+      let i = 0
+      function update(){
+        let obj = values[i]
+        i++
+        if(!obj) return
+        let el = obj.el
+        el.addEventListener('transitionend', ()=>{
+          update()
+        })
+        el.style.strokeDasharray = obj.dashLength + ' ' + obj.dashNegative
+        el.style.strokeDashoffset = -offset
+        var maskLength = obj.dashLength + offset + buffer
+        mask.style.strokeDasharray = maskLength + ' ' + (circumference - maskLength)
+        offset += obj.dashLength + buffer;
+      }
+      update()
+    }
 </script>
