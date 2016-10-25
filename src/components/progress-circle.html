@@ -10,7 +10,7 @@
 </template>
 
 <script>
-  let progressCircle = new Kepler({
+  let progressCircle = Kepler.Component({
     element: '#progress-circle',
     name: 'progress-circle',
     // expose: false,
@@ -23,7 +23,13 @@
       }
     },
     methods : {
-
+      foo: function(){
+        return 'foooooooooooooooooo'
+      },
+      init: function(){
+        console.log(this)
+        debugger
+      }
     }
   })
 </script>

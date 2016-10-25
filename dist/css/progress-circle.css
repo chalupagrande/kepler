@@ -1,31 +1,31 @@
-:kepler circle {
+circle {
   fill: none;
   stroke-width: 6px;
   transition: transform 0.3s, stroke-width 0.3s, stroke-dasharray 0.3s;
   transform-origin: 50% 50%; }
 
-:kepler .normal {
+.normal {
   stroke: #8cd211; }
-  :kepler .normal:hover {
+  .normal:hover {
     stroke-width: 15px; }
 
-:kepler .warning {
+.warning {
   stroke: #efc100; }
-  :kepler .warning:hover {
+  .warning:hover {
     stroke-width: 15px; }
 
-:kepler .critical {
+.critical {
   stroke: #e71d32; }
-  :kepler .critical:hover {
+  .critical:hover {
     stroke-width: 15px; }
 
-:kepler .down {
+.down {
   stroke: #8c9ba5; }
 
-:kepler .mask {
+.mask {
   stroke: #2d3f49;
   stroke-width: 8px; }
 
-:kepler .active {
+.active {
   transform: scale(1.2);
   stroke-width: 15px; }

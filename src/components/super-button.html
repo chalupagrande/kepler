@@ -1,4 +1,4 @@
-<!--
+
 <template id="component">
   <style type="text/css">
     button {
@@ -23,12 +23,18 @@ var template = importee.getElementById('component')
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 //register custom element
+
+function K(){
+  this.root = null
+
+
+}
+
+
 var superButton = Object.create(HTMLElement.prototype);
 superButton.createdCallback = function() {
-  console.log(this)
   var clone = document.importNode(template.content, true)
   var text = clone.querySelector('button').getAttribute('data-text')
-  console.log('this', this)
 
   var root = this.createShadowRoot()
 
@@ -40,10 +46,9 @@ superButton.createdCallback = function() {
   }
 
   root.appendChild(clone)
-  console.log("ROOT LOG", root)
 };
 superButton.attachedCallback = function(){
-  console.log('attached')
+  // console.log('attached')
 }
 superButton.detachedCallback = function(){
   console.log('detached')
@@ -52,12 +57,9 @@ superButton.attributeChangedCallback = function(){
   console.log('changed')
 }
 
-superButton.foo = function() {
-  console.log('foo() called');
-};
 
 var myButton = document.registerElement('super-button', {
   prototype: superButton
 });
 
-</script> -->
+</script>

@@ -1,41 +1,39 @@
-:kepler {
-  circle {
-    fill: none;
-    stroke-width: 6px;
-    transition: transform 0.3s, stroke-width 0.3s, stroke-dasharray 0.3s;
-    transform-origin: 50% 50%;
-  }
+circle {
+  fill: none;
+  stroke-width: 6px;
+  transition: transform 0.3s, stroke-width 0.3s, stroke-dasharray 0.3s;
+  transform-origin: 50% 50%;
+}
 
-  .normal {
-    stroke: #8cd211;
-    &:hover{
-      stroke-width: 15px;
-    }
-  }
-  .warning {
-    stroke: #efc100;
-    &:hover{
-      stroke-width: 15px;
-    }
-  }
-  .critical {
-    stroke: #e71d32;
-    &:hover{
-      stroke-width: 15px;
-    }
-  }
-
-  .down {
-    stroke: #8c9ba5;
-    // stroke-width: 4px;
-  }
-  .mask {
-    stroke: #2d3f49;
-    stroke-width: 8px;
-  }
-
-  .active {
-    transform: scale(1.2);
+.normal {
+  stroke: #8cd211;
+  &:hover{
     stroke-width: 15px;
   }
+}
+.warning {
+  stroke: #efc100;
+  &:hover{
+    stroke-width: 15px;
+  }
+}
+.critical {
+  stroke: #e71d32;
+  &:hover{
+    stroke-width: 15px;
+  }
+}
+
+.down {
+  stroke: #8c9ba5;
+  // stroke-width: 4px;
+}
+.mask {
+  stroke: #2d3f49;
+  stroke-width: 8px;
+}
+
+.active {
+  transform: scale(1.2);
+  stroke-width: 15px;
 }

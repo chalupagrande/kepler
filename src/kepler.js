@@ -13,9 +13,7 @@ class Kepler {
 
     let node = Object.create(HTMLElement.prototype)
     node.createdCallback = function(){
-      // createDemoStyleTag(template)
       this._root = this.createShadowRoot()
-
       let callback = (function(){
         let clone = document.importNode(template.content, true)
 
@@ -58,12 +56,12 @@ class Kepler {
     }
 
 
-    node.foo = function(){
+    node._foo = function(){
       console.log('fooooooo')
     }
 
     let register = function(){
-      var jamie = document.registerElement(opts.name, {
+      document.registerElement(opts.name, {
         prototype: node
       })
     }
@@ -101,24 +99,6 @@ function getStyleSheet(fragment, cb){
     console.log(xhr.statusText)
   }
   xhr.send(null)
-
-
-  //NOTE: UNABLE TO USE ASYNCHRONOUS FETCH BECAUSE DOM NODE IS ATTACHING
-  //  BEFORE STYLE SHEET IS APPLIED.
-
-  // fetch(path).then(function(response){
-  //   return response.blob()
-  // }).then(function(blob){
-  //   var reader = new FileReader()
-  //   reader.addEventListener("loadend", function(){
-  //     //SUCCESSFULLY FETCHED THE STYLES!!
-  //     createStyleTag(fragment, this.result)
-  //     cb()
-  //   })
-  //   reader.readAsText(blob)
-
-  // })
-
 }
 
 
