@@ -11,7 +11,7 @@ gulp.task('serve', ['compile-sass', 'compile-js'], function(){
       baseDir:'./'
     }
   })
-  gulp.watch(['src/kepler.js'] , ['compile-js'])
+  gulp.watch(['src/*.js'] , ['compile-js'])
   gulp.watch(['src/**/*.scss'] , ['compile-sass'])
   gulp.watch(['src/**/*.js', '**/*.html', 'src/**/*.scss']).on('change', browserSync.reload)
 })

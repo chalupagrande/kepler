@@ -1,16 +1,18 @@
 let Kepler = (()=>{
-
-  setup()
   var _events = {};
 
   return {
     components: new Map(),
+    //COMPONENT CREATOR
     Component: function(element, opts){
 
       let importee = (document._currentScript || document.currentScript).ownerDocument;
       var template = importee.querySelector(element)
       let prototype = Object.create(HTMLElement.prototype)
+      //TODO -- ADD DATABINDING
       prototype._vm = addDataBinding.call(prototype, opts.properties, template)
+
+      //TODO -- move the _root
       prototype._vm._root = null
 
       prototype.createdCallback = function(){
@@ -30,6 +32,7 @@ let Kepler = (()=>{
 
       prototype.attachedCallback = function(){
         //bind listeners to the elements within the template
+
         let listeners = opts.listeners
         for(let event in opts.listeners){
           for(let element in listeners[event]){
@@ -62,6 +65,27 @@ let Kepler = (()=>{
       return this.register(prototype, opts.name || element.slice(1))
     },
 
+    //MODEL CLASS
+    Model: function(opts){
+      let obj = Object.assign(opts, {
+        set: function(prop, d){
+          //ADD DATABINDING HERE
+          this[prop] = d
+        },
+        get: function(prop){
+          //ADD DATABINDING HERE
+          return this[prop]
+        }
+      }, true)
+      return obj
+
+    },// END MODEL
+
+
+    /*
+      EXTRA CREDIT
+    ~~~~~~~~~~~~~~~~~~~~~~~ */
+
     register: function(prototype, name){
       return ((prototype, name)=>{
         return document.registerElement(name, {
@@ -83,7 +107,8 @@ let Kepler = (()=>{
         console.warn('There is no event by the name of '+event)
       }
     },
-  }// end KEPLER Object
+  }
+
 
 
   /*
@@ -121,11 +146,12 @@ let Kepler = (()=>{
   searches throught the `catalog`, and replaces the keys with the valuse in `values`
   ~~~~~~~~~~~~~~~*/
   function parse(catalog, values){
+    debugger;
     var template = catalog.innerHTML || catalog;
-    var re = /\$\{([^\}]+)?\}/g,
+    var re = /\{\{([^\}]+)?\}\}/g,  // matches {{ thing.here }}
         match;
     while(match = re.exec(template)){
-      template = template.replace(match[0], values[match[1]])
+      template = findTag(match, values[match[1]])
     }
     return template
   }
@@ -146,78 +172,60 @@ let Kepler = (()=>{
           /*
             The template at this point is the UPDATED Element..
             meaning that it no longer has the binding
-            I need references to where the the original ${} was.
+            I need references to where the the original {{}} was.
           */
-          this._root.innerHTML = parse(this._root, this )
-          return  copy[key] = d
+
+          /*
+          TODO <<<<<<< 11/3/2016 | 6:09pm
+              compile a list of references with the k-tags in the _vm and use
+              those to be set but the parse
+          */
+
+          copy[key] = d
+          this._root.innerHTML = parse(this._root, copy)
+          return
         }
       }
     })
     return Object.defineProperties(obj, bound)
   }
 
+  /*  --  FIND TAG
 
+    This takes a REGEXP match object, and a value to replace that
+    match's input text with, and returns a new HTML String where the DOM
+    element that contained the match is marked with:
 
+    `k-tag = {{name_of_property}}`
 
+    So if the component has a property of `title: 'Kepler'`, and the template text
+    looks like this `<h1> Chapter 1: {{title}}</h1>`, findTag will spit out:
 
+    `<h1 k-tag='kepler'> Chapter 1: Kepler</h1>`
 
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+  function findTag(match, value){
+    let input = match.input
+    let index = match.index
+    let htmlString, taggedHTMLString, replacedTaggedHTMLString, newTemplate, DOMElement, parser = new DOMParser(), result = [];
+    while(input[index] != '<'){
+      index -=1
+    }
+    while(result.length < 4){
+      if(input[index] == ">" || input[index] == "<"){
+        result.push(index)
+      }
+      index+=1
+    }
+    result[3]+=1
+    htmlString = input.slice(result[0], result[3])
+    DOMElement = parser.parseFromString(htmlString, 'text/xml').firstChild
+    DOMElement.setAttribute('k-tag', match[1])
+    taggedHTMLString = DOMElement.outerHTML
+    replacedTaggedHTMLString = taggedHTMLString.replace(new RegExp(match[0],'g'), value)
+    newTemplate = input.replace(htmlString, replacedTaggedHTMLString)
+    return newTemplate
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  /*
-
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-  // function extendBrowserSupport(){
-  //   if (!Object.prototype.watch)
-  //       Object.prototype.watch = function (prop, handler) {
-  //           var oldval = this[prop], newval = oldval,
-  //           getter = function () {
-  //               return newval;
-  //           },
-  //           setter = function (val) {
-  //               oldval = newval;
-  //               return newval = handler.call(this, prop, oldval, val);
-  //           };
-  //           if (delete this[prop]) { // can't watch constants
-  //               if (Object.defineProperty) // ECMAScript 5
-  //                   Object.defineProperty(this, prop, {
-  //                       get: getter,
-  //                       set: setter
-  //                   });
-  //               else if (Object.prototype.__defineGetter__ && Object.prototype.__defineSetter__) { // legacy
-  //                   Object.prototype.__defineGetter__.call(this, prop, getter);
-  //                   Object.prototype.__defineSetter__.call(this, prop, setter);
-  //               }
-  //           }
-  //       };
-
-  //   // object.unwatch
-  //   if (!Object.prototype.unwatch)
-  //       Object.prototype.unwatch = function (prop) {
-  //           var val = this[prop];
-  //           delete this[prop]; // remove accessors
-  //           this[prop] = val;
-  //       };
-  // }
-
-  function setup(){
-    // extendBrowserSupport()
   }
 
 })()

@@ -1,7 +1,7 @@
 <template id="progress-circle">
   <link rel="import" href="../../dist/css/progress-circle.css">
   <content>
-  <h1>${title}</h1>
+  <h1 class="{{title}}">The title is {{title}}</h1>
   <svg class="animated" height="150" width="150">
     <circle class="down" cx="50%" cy="50%" r="50" stroke-dasharray="2 5"/>
     <circle class="mask" cx="50%" cy="50%" r="50" stroke-dasharray="0 314" stroke-dashoffset="0"/>
@@ -9,6 +9,7 @@
     <circle class="warning" cx="50%" cy="50%" r="50" stroke-dasharray="0 314" stroke-dashoffset="0"/>
     <circle class="critical" cx="50%" cy="50%" r="50" stroke-dasharray="0 314" stroke-dashoffset="0"/>
   </svg>
+  <p>{{footer}}</p>
   </content>
 </template>
 
@@ -35,7 +36,11 @@
       }
     },
     properties: {
-      title: 'Progress Circle'
+      title: 'Progress Circle',
+      footer: 'This is the footer text that should be there.',
+
+      //templating works for CSS PROPERTIES...
+      color: '#efc100'
     }
 
   })
