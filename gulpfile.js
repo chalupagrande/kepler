@@ -35,5 +35,4 @@ gulp.task('compile-sass', function(){
             .pipe(gulp.dest('./dist/css/'))
 })
 
-gulp.task('default', ['serve'], function(){
-})
+gulp.task('default', ['serve'])

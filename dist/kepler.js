@@ -1,167 +1,210 @@
 'use strict';
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 var Kepler = function () {
-  /*
-    opts: {
-      element: CSS SELECTOR --id of component template
-      name: STRING -- string for component name
-      expose: BOOLEAN -- expose the component to the DOM
-      createdCallback: FUNC -- function to be called when element is created
-    }
-  */
-  function Kepler(opts) {
-    _classCallCheck(this, Kepler);
 
-    var importee = (document._currentScript || document.currentScript).ownerDocument;
-    var template = importee.querySelector(opts.element);
+  setup();
+  var _events = {};
 
-    var node = Object.create(HTMLElement.prototype);
-    node.createdCallback = function () {
-      this._root = this.createShadowRoot();
-      var callback = function () {
-        var clone = document.importNode(template.content, true);
+  return {
+    components: new Map(),
+    Component: function Component(element, opts) {
 
-        // complicates things
-        // if(opts.expose){
-        //   this.appendChild(clone)
-        // } else {
-        //   this._root.appendChild(clone)
-        // }
-        this._root.appendChild(clone);
+      var importee = (document._currentScript || document.currentScript).ownerDocument;
+      var template = importee.querySelector(element);
+      var prototype = Object.create(HTMLElement.prototype);
+      prototype._vm = addDataBinding.call(prototype, opts.properties, template);
+      prototype._vm._root = null;
 
-        console.log('calling back');
-      }.bind(this);
-      getStyleSheet(template.content, callback);
-    };
-
-    //attachedCallback
-    node.attachedCallback = function () {
-      var _this = this;
-
-      console.log('attached');
-      //attach event listeners
-      var listeners = opts.listeners;
-
-      var _loop = function _loop(event) {
-        var _loop2 = function _loop2(element) {
-          var els = _this._root.querySelectorAll(element);
-          els.forEach(function (el) {
-            el.addEventListener(event, listeners[event][element]);
-          });
-        };
-
-        for (var element in listeners[event]) {
-          _loop2(element);
+      prototype.createdCallback = function () {
+        prototype._vm._root = this.createShadowRoot();
+        var callback = function () {
+          //duplicates node appends it to shadowroot
+          prototype._vm._root.appendChild(document.importNode(template.content, true));
+          Kepler.components.set(this, { template: template });
+        }.bind(this);
+        //fetch linked styles in template and create styletag
+        if (template.content.querySelector('link[rel="import"]')) {
+          getStyleSheet(template.content, callback);
+        } else {
+          callback();
         }
       };
 
-      for (var event in listeners) {
-        _loop(event);
-      }
-    };
-    node.detachedCallback = function () {
-      console.log('detachedCallback');
+      prototype.attachedCallback = function () {
+        var _this = this;
 
-      //TODO: detach event listeners? Not sure if i need to
-    };
-    //attributeChangedCallback
-    node.attributeChangedCallback = function () {
-      console.log('attribtue changed');
-    };
+        //bind listeners to the elements within the template
+        var listeners = opts.listeners;
 
-    node._foo = function () {
-      console.log('fooooooo');
-    };
+        var _loop = function _loop(event) {
+          var _loop2 = function _loop2(_element) {
+            var els = _this._vm._root.querySelectorAll(_element);
+            els.forEach(function (el) {
+              el.addEventListener(event, listeners[event][_element]);
+            });
+          };
 
-    var register = function register() {
-      document.registerElement(opts.name, {
-        prototype: node
-      });
-    };
-    register.call(window);
+          for (var _element in listeners[event]) {
+            _loop2(_element);
+          }
+        };
 
-    this.node = node;
-  }
+        for (var event in opts.listeners) {
+          _loop(event);
+        }
 
-  _createClass(Kepler, [{
-    key: 'method',
-    value: function method() {
-      console.log('KEPLER');
-    }
-  }]);
+        //bind methods to web-component
+        for (var methodName in opts.methods) {
+          this[methodName] = opts.methods[methodName].bind(this);
+        }
+        if (opts.methods.init) {
+          opts.methods.init.call(this);
+        }
 
-  return Kepler;
-}();
+        this._vm._root.innerHTML = parse(template, opts.properties);
+      };
 
-/* Helpers
-~~~~~~~~~~~~~~ */
+      prototype.detachedCallback = function () {
+        Kepler.components.delete(this);
+      };
 
-function getStyleSheet(fragment, cb) {
-  var path = fragment.querySelector('link').getAttribute('href');
+      prototype.attributeChangedCallback = function () {
+        console.log('attr');
+      };
 
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', path, false);
-  xhr.onload = function (e) {
-    if (xhr.readyState === 4) {
-      if (xhr.status === 200) {
-        console.log(xhr.responseText);
-        createStyleTag(fragment, xhr.responseText);
-        cb();
+      return this.register(prototype, opts.name || element.slice(1));
+    },
+
+    register: function register(prototype, name) {
+      return function (prototype, name) {
+        return document.registerElement(name, {
+          prototype: prototype
+        });
+      }.call(window, prototype, name);
+    },
+
+    on: function on(event, callback) {
+      if (_events[event]) console.warn('\'' + event + '\' already exists, and was overwritten.');
+      _events[event] = callback;
+    },
+
+    trigger: function trigger(event, context) {
+      var args = arguments.length <= 2 || arguments[2] === undefined ? [] : arguments[2];
+
+      var cb = _events[event];
+      if (cb) {
+        return cb.apply(context, args);
       } else {
-        console.error(xhr.statusText);
+        console.warn('There is no event by the name of ' + event);
       }
     }
-  };
-  xhr.onerror = function (e) {
-    console.log(xhr.statusText);
-  };
-  xhr.send(null);
-}
+  }; // end KEPLER Object
 
-function createDemoStyleTag(fragment) {
-  var style = document.createElement('style');
-  style.innerHTML = "button { background-color: cyan}";
-  fragment.content.appendChild(style);
-}
 
-function createStyleTag(fragment, styleText) {
-  var result = findEncapsulatedStyles(styleText);
-  //add encapsulated styles to fragment
-  var encapsulatedStyle = document.createElement('style');
-  encapsulatedStyle.innerHTML = result.tagged;
-  fragment.insertBefore(encapsulatedStyle, fragment.firstElementChild);
-
-  //add styles to Global Stylesheet
-  var globalStyle = document.createElement('style');
-  globalStyle.innerHTML = result.untagged;
-  document.head.appendChild(globalStyle);
-}
-
-// TODO:  make this regex more elegant.
-// TODO / IDEA: reverse the meaning of TAGGED/UNTAGGED depending on whether
-//    or not the expose variable is true.
-function findEncapsulatedStyles(styleString) {
-  var result = {
-    tagged: [],
-    untagged: []
-  };
-
-  var initialTagged = styleString.match(/\:kepler[^{]+[^}]+/gi);
-  if (initialTagged) {
-    result.tagged = initialTagged.map(function (el) {
-      styleString = styleString.replace(el + '}', '');
-      el = el.replace(/\:kepler /gi, '');
-      return el += '}';
-    });
-    result.tagged = result.tagged.join('\n');
+  /*
+    HELPERS
+  ~~~~~~~~~~~~~~~~~~~~~~~~ */
+  function getStyleSheet(fragment, cb) {
+    var path = fragment.querySelector('link').getAttribute('href');
+    var xhr = new XMLHttpRequest();
+    // false makes it synchronous!!!
+    xhr.open('GET', path, false);
+    xhr.onload = function (e) {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          createStyleTag(fragment, xhr.responseText);
+          cb();
+        } else {
+          console.error(xhr.statusText);
+        }
+      }
+    };
+    xhr.onerror = function (e) {};
+    xhr.send(null);
   }
-  result.untagged.push(styleString.trim());
-  result.untagged = result.untagged.join('\n');
 
-  console.log(result);
-  return result;
-}
+  function createStyleTag(fragment, styleText) {
+    //add encapsulated styles to fragment
+    var encapsulatedStyle = document.createElement('style');
+    encapsulatedStyle.innerHTML = styleText;
+    fragment.insertBefore(encapsulatedStyle, fragment.firstElementChild);
+  }
+
+  /*
+    Parse
+  searches throught the `catalog`, and replaces the keys with the valuse in `values`
+  ~~~~~~~~~~~~~~~*/
+  function parse(catalog, values) {
+    var template = catalog.innerHTML || catalog;
+    var re = /\$\{([^\}]+)?\}/g,
+        match;
+    while (match = re.exec(template)) {
+      template = template.replace(match[0], values[match[1]]);
+    }
+    return template;
+  }
+
+  function addDataBinding(obj, handler) {
+    var copy = Object.assign({}, obj, true);
+    var bound = {};
+    Object.keys(copy).forEach(function (key) {
+      bound[key] = {
+        get: function get() {
+          return copy[key];
+        },
+        set: function set(d) {
+          console.log(this);
+          debugger;
+
+          /*
+            The template at this point is the UPDATED Element..
+            meaning that it no longer has the binding
+            I need references to where the the original ${} was.
+          */
+          this._root.innerHTML = parse(this._root, this);
+          return copy[key] = d;
+        }
+      };
+    });
+    return Object.defineProperties(obj, bound);
+  }
+
+  /*
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+  // function extendBrowserSupport(){
+  //   if (!Object.prototype.watch)
+  //       Object.prototype.watch = function (prop, handler) {
+  //           var oldval = this[prop], newval = oldval,
+  //           getter = function () {
+  //               return newval;
+  //           },
+  //           setter = function (val) {
+  //               oldval = newval;
+  //               return newval = handler.call(this, prop, oldval, val);
+  //           };
+  //           if (delete this[prop]) { // can't watch constants
+  //               if (Object.defineProperty) // ECMAScript 5
+  //                   Object.defineProperty(this, prop, {
+  //                       get: getter,
+  //                       set: setter
+  //                   });
+  //               else if (Object.prototype.__defineGetter__ && Object.prototype.__defineSetter__) { // legacy
+  //                   Object.prototype.__defineGetter__.call(this, prop, getter);
+  //                   Object.prototype.__defineSetter__.call(this, prop, setter);
+  //               }
+  //           }
+  //       };
+
+  //   // object.unwatch
+  //   if (!Object.prototype.unwatch)
+  //       Object.prototype.unwatch = function (prop) {
+  //           var val = this[prop];
+  //           delete this[prop]; // remove accessors
+  //           this[prop] = val;
+  //       };
+  // }
+
+  function setup() {
+    // extendBrowserSupport()
+  }
+}();
