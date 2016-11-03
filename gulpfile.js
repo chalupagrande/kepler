@@ -23,7 +23,7 @@ gulp.task('compile-js', function(){
                presets: ['es2015']
              }))
              .pipe(plumber.stop())
-             .pipe(gulp.dest('./dist'))
+             .pipe(gulp.dest('./dist/scripts'))
 })
 
 
