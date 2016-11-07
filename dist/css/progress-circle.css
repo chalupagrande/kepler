@@ -13,7 +13,7 @@ circle {
     stroke-width: 15px; }
 
 .warning {
-  stroke: {{color}}; }
+  stroke: #efc100; }
   .warning:hover {
     stroke-width: 15px; }
 

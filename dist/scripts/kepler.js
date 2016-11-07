@@ -190,6 +190,11 @@ var Kepler = function () {
           TODO <<<<<<< 11/3/2016 | 6:09pm
               compile a list of references with the k-tags in the _vm and use
               those to be set but the parse
+           IDEA <<<<
+              You could grab the references made to k-tag on the components
+              attached lifecycle, create a MAP of those references, with the
+              DOMElement => template w/ {{}} ... and then remove the k-tags.
+              It was like you were never there!!!!!
           */
 
           copy[key] = d;
